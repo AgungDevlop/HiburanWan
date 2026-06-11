@@ -81,7 +81,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </main>
 
       <footer className="bg-gray-800 p-4 text-white text-center">
-        <p>© {new Date().getFullYear()} Prime Stream. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Max Stream. All rights reserved.</p>
       </footer>
     </div>
   );
