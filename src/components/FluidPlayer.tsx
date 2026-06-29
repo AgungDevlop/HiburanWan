@@ -47,7 +47,7 @@ const FluidPlayer: React.FC<FluidPlayerProps> = ({ src, title }) => {
             allowDownload: false,
             playButtonShowing: true,
             fillToContainer: false,
-            primaryColor: "#230fff",
+            primaryColor: "#8b5cf6",
             posterImage: ""
           },
           vastOptions: {

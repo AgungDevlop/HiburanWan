@@ -6,7 +6,7 @@ import App from "./App.tsx";
 import "./index.css";
 
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { Contact } from "./pages/Contact.tsx";
+import { About } from "./pages/About.tsx";
 import { PlayVideo } from "./pages/PlayVideo.tsx";
 import { Download } from "./pages/Download.tsx";
 import Redirect from "./pages/Redirect.tsx";
@@ -21,9 +21,13 @@ const router = createBrowserRouter([
         index: true,
         element: <Home />,
       },
-      { 
-        path: "search",
-        element: <PlayVideo /> 
+      {
+        path: "about", // Halaman tentang (anonim)
+        element: <About />,
+      },
+      {
+        path: "search", // Halaman jelajah / pencarian video (grid + search)
+        element: <PlayVideo />,
       },
       {
         path: ":id", // Rute dinamis berdasarkan ID
@@ -60,10 +64,6 @@ const router = createBrowserRouter([
       {
         path: "download", // Rute untuk halaman Download
         element: <Download />,
-      },
-      {
-        path: "contact", // Rute untuk halaman Contact
-        element: <Contact />,
       },
       {
         path: "s/:id",

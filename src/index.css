@@ -1,3 +1,117 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-ink-950 text-slate-200 font-sans antialiased;
+    background-image:
+      radial-gradient(900px 500px at 50% -10%, rgba(139, 92, 246, 0.12), transparent 60%),
+      radial-gradient(700px 400px at 100% 0%, rgba(217, 70, 239, 0.08), transparent 55%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    @apply bg-brand-500/40 text-white;
+  }
+}
+
+@layer components {
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(120deg, #c4b5fd 0%, #d946ef 45%, #fb7185 100%);
+  }
+
+  .btn-gradient {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold text-white transition-all duration-300;
+    background-image: linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #f43f5e 100%);
+    box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.6);
+  }
+  .btn-gradient:hover {
+    @apply -translate-y-0.5;
+    box-shadow: 0 16px 40px -12px rgba(217, 70, 239, 0.7);
+  }
+  .btn-gradient:active {
+    @apply translate-y-0;
+  }
+
+  .glass {
+    @apply border border-white/10 bg-white/[0.04] backdrop-blur-xl;
+  }
+
+  .card-surface {
+    @apply rounded-2xl border border-white/10 bg-ink-850/70 backdrop-blur-sm shadow-card;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0b14;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #6d28d9, #a21caf);
+  border-radius: 999px;
+  border: 2px solid #0b0b14;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #7c3aed, #c026d3);
+}
+
+/* Thin horizontal scrollbar for carousels */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+}
+
+/* Range / slider inputs (player + volume) */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 14px;
+  width: 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.4);
+  margin-top: -5px;
+}
+input[type="range"]::-moz-range-thumb {
+  height: 14px;
+  width: 14px;
+  border: none;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.4);
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(90deg, #16162a 25%, #232342 37%, #16162a 63%);
+  background-size: 468px 100%;
+  @apply animate-shimmer;
+}
+
+/* Fluid Player accent override */
+.fluid_video_wrapper .fluid_controls_container {
+  border-radius: 0 0 0.75rem 0.75rem;
+}

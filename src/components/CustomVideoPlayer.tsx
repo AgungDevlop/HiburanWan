@@ -121,8 +121,8 @@ const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({ src, title }) => 
           </div>
       )}
 
-      <div className="absolute top-3 right-3 bg-green-600 text-white text-sm font-bold px-2 py-1 rounded-md pointer-events-none">
-        Vidify Stream
+      <div className="absolute top-3 right-3 bg-brand-gradient text-white text-sm font-bold px-2 py-1 rounded-md pointer-events-none">
+        Dunia Hiburan
       </div>
       
       {isSharePanelOpen && (

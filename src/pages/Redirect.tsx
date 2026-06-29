@@ -27,8 +27,11 @@ const Redirect = () => {
   }, [id, navigate]);
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center bg-black">
-      <p className="text-white text-xl">Redirecting...</p>
+    <div className="fixed inset-0 z-[60] flex flex-col justify-center items-center gap-5 bg-ink-950">
+      <div className="absolute inset-0 bg-grid-glow pointer-events-none" />
+      <span className="h-14 w-14 rounded-full border-2 border-white/10 border-t-brand-400 animate-spin-slow" />
+      <p className="text-slate-300 text-lg font-medium tracking-wide">Mengalihkan...</p>
+      <p className="text-slate-500 text-sm">Mohon tunggu sebentar.</p>
     </div>
   );
 };

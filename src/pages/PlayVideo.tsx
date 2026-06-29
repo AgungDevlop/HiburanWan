@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { FaCopy, FaDownload, FaPlay, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCopy, FaDownload, FaPlay, FaExclamationTriangle, FaCheck, FaLock } from 'react-icons/fa';
 import { useLayout } from '../context/LayoutContext';
 
 declare global {
@@ -46,27 +46,47 @@ const LazyThumbnail = ({ url }: { url: string }) => {
   );
 };
 
-const RecentPostCard = ({ video, onClick }: { video: any, onClick: (videoId: string) => void }) => (
-  <div onClick={() => onClick(video.id)} className="group w-64 flex-shrink-0 cursor-pointer">
-    <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black border border-gray-700 group-hover:border-blue-500 transition-all">
+const VideoCard = ({ video, onClick }: { video: any; onClick: (videoId: string) => void }) => (
+  <div onClick={() => onClick(video.id)} className="group cursor-pointer animate-fade-in">
+    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black border border-white/10 group-hover:border-brand-500/60 transition-all duration-300 group-hover:shadow-glow-soft">
       <LazyThumbnail url={video.Url} />
-      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <FaPlay className="text-white text-4xl" />
-      </div>
-      <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-md">
-        New
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+      <div className="absolute inset-0 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <span className="grid place-items-center h-12 w-12 rounded-full bg-brand-gradient shadow-glow">
+          <FaPlay className="text-white ml-0.5" size={16} />
+        </span>
       </div>
     </div>
-    <div className="mt-2">
-      <h3 className="text-white font-medium text-sm line-clamp-2">{video.Judul}</h3>
-    </div>
+    <h3 className="mt-2 text-sm font-medium text-slate-200 line-clamp-2 group-hover:text-white transition">
+      {video.Judul}
+    </h3>
   </div>
 );
 
-const RecentPostsView = ({ videos, onCardClick }: { videos: any[], onCardClick: (videoId: string) => void }) => (
-  <div className="mb-8">
-    <h2 className="text-2xl font-bold mb-4 text-gray-300">Recent Posts</h2>
-    <div className="flex gap-4 overflow-x-auto pb-4 -mb-4">
+const RecentPostCard = ({ video, onClick }: { video: any; onClick: (videoId: string) => void }) => (
+  <div onClick={() => onClick(video.id)} className="group w-56 sm:w-64 flex-shrink-0 cursor-pointer">
+    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black border border-white/10 group-hover:border-brand-500/60 transition-all duration-300 group-hover:shadow-glow-soft">
+      <LazyThumbnail url={video.Url} />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+      <div className="absolute inset-0 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <span className="grid place-items-center h-12 w-12 rounded-full bg-brand-gradient shadow-glow">
+          <FaPlay className="text-white ml-0.5" size={16} />
+        </span>
+      </div>
+      <span className="absolute top-2 left-2 bg-brand-gradient text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
+        BARU
+      </span>
+    </div>
+    <h3 className="mt-2 text-sm font-medium text-slate-200 line-clamp-2 group-hover:text-white transition">
+      {video.Judul}
+    </h3>
+  </div>
+);
+
+const RecentPostsView = ({ videos, onCardClick }: { videos: any[]; onCardClick: (videoId: string) => void }) => (
+  <div className="mb-10">
+    <h2 className="font-display text-xl sm:text-2xl font-bold mb-4 text-white">Postingan Terbaru</h2>
+    <div className="flex gap-4 overflow-x-auto pb-4 -mb-4 scrollbar-thin">
       {videos.map((video) => (
         <RecentPostCard key={video.id} video={video} onClick={onCardClick} />
       ))}
@@ -88,6 +108,7 @@ export function PlayVideo() {
   const [recentVideos, setRecentVideos] = useState<any[]>([]);
   const [filteredVideos, setFilteredVideos] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [copied, setCopied] = useState<boolean>(false);
   const videosPerPage = 12;
 
   const playerInstance = useRef<any>(null);
@@ -105,11 +126,12 @@ export function PlayVideo() {
     return result;
   };
 
+  // PlayVideo hanya dirender pada pathname video/jelajah (bukan beranda),
+  // jadi search bar & grid selalu aktif di sini.
   useEffect(() => {
     const fetchVideoData = async () => {
       setLoading(true);
       setVideoFound(true);
-      setShowSearch(false);
 
       try {
         const response = await fetch('https://raw.githubusercontent.com/AgungDevlop/Viral/refs/heads/main/Video.json');
@@ -120,7 +142,6 @@ export function PlayVideo() {
         if (id) {
           const video = data.find((item: { id: string }) => item.id === id);
           if (video) {
-            setShowSearch(true);
             setVideoUrl(video.Url);
             setVideoTitle(video.Judul);
             sessionStorage.setItem('videoUrl', video.Url);
@@ -137,11 +158,8 @@ export function PlayVideo() {
       }
     };
 
-    if (id || query) {
-      fetchVideoData();
-    } else {
-      setLoading(false);
-    }
+    setShowSearch(true);
+    fetchVideoData();
 
     return () => {
       setShowSearch(false);
@@ -190,7 +208,7 @@ export function PlayVideo() {
             allowDownload: false,
             playButtonShowing: true,
             fillToContainer: false,
-            primaryColor: '#3b82f6',
+            primaryColor: '#8b5cf6',
             posterImage: ''
           }
         });
@@ -228,7 +246,8 @@ export function PlayVideo() {
   const handleCopy = () => {
     if (id) {
       navigator.clipboard.writeText(`https://${window.location.hostname}/play/${id}`);
-      alert('Video link copied to clipboard!');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -245,10 +264,10 @@ export function PlayVideo() {
   useEffect(() => {
     const results = query
       ? videos.filter(video => video.Judul.toLowerCase().includes(query.toLowerCase()))
-      : id ? videos : [];
+      : videos;
     setFilteredVideos(results);
     setCurrentPage(1);
-  }, [query, videos, id]);
+  }, [query, videos]);
 
   const indexOfLastVideo = currentPage * videosPerPage;
   const indexOfFirstVideo = indexOfLastVideo - videosPerPage;
@@ -262,94 +281,123 @@ export function PlayVideo() {
   };
 
   if (loading) {
-    return <div className="text-center p-10 text-white">Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <span className="h-12 w-12 rounded-full border-2 border-white/10 border-t-brand-400 animate-spin-slow" />
+        <p className="text-slate-400 text-sm">Memuat tontonan...</p>
+      </div>
+    );
   }
 
   if (id && !videoFound) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] text-gray-400 text-center p-4">
-        <FaExclamationTriangle size={64} className="mb-4 text-red-500" />
-        <h1 className="text-2xl font-bold text-gray-300">Video Not Found</h1>
-        <p className="mt-2 max-w-md">
-          Sorry, the video you are looking for does not exist or may have been removed.
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <span className="grid place-items-center h-20 w-20 rounded-2xl bg-brand-gradient-soft border border-white/10 mb-6">
+          <FaExclamationTriangle size={36} className="text-rose-400" />
+        </span>
+        <h1 className="font-display text-2xl font-bold text-white">Video Tidak Ditemukan</h1>
+        <p className="mt-2 max-w-md text-slate-400">
+          Maaf, video yang kamu cari tidak tersedia atau mungkin sudah dihapus.
         </p>
-        <Link to="/" className="mt-6 inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Go to Homepage
+        <Link to="/" className="btn-gradient mt-6">
+          Kembali ke Beranda
         </Link>
       </div>
     );
   }
 
   const PlayerView = () => (
-    <div className="bg-gray-800 p-4 rounded-lg shadow-lg mb-8">
-      <h1 className="text-2xl font-bold mb-4 text-center break-words text-blue-400">{videoTitle}</h1>
-      <div className="w-full aspect-video rounded-lg overflow-hidden shadow-lg border border-gray-700 flex items-center justify-center bg-black">
+    <div className="card-surface p-4 sm:p-6 mb-10 animate-fade-up">
+      <h1 className="font-display text-xl sm:text-2xl font-bold mb-4 text-center break-words text-white">
+        {videoTitle}
+      </h1>
+      <div className="w-full aspect-video rounded-xl overflow-hidden border border-white/10 flex items-center justify-center bg-black">
         <video id="video-player" style={{ width: '100%', height: '100%' }} preload="metadata" playsInline key={videoUrl}>
           <source src={videoUrl} type="video/mp4" />
         </video>
       </div>
-      <div className="flex mt-4 mb-4 border border-gray-700 rounded-lg overflow-hidden">
-        <input type="text" value={`https://${window.location.hostname}/play/${id}`} readOnly className="flex-1 p-3 bg-gray-900 text-white outline-none" />
-        <button onClick={handleCopy} className="bg-blue-600 hover:bg-blue-700 transition-colors text-white p-3">
-          <FaCopy />
+
+      <div className="flex mt-5 border border-white/10 rounded-xl overflow-hidden bg-ink-900/60">
+        <input
+          type="text"
+          value={`https://${window.location.hostname}/play/${id}`}
+          readOnly
+          className="flex-1 px-4 py-3 bg-transparent text-slate-300 text-sm outline-none truncate"
+        />
+        <button
+          onClick={handleCopy}
+          className={`px-4 flex items-center gap-2 text-white font-medium transition-colors ${
+            copied ? 'bg-emerald-600' : 'bg-brand-gradient'
+          }`}
+        >
+          {copied ? <FaCheck /> : <FaCopy />}
+          <span className="hidden sm:inline">{copied ? 'Tersalin' : 'Salin'}</span>
         </button>
       </div>
-      <button onClick={handleDownloadClick} className="w-full bg-blue-700 hover:bg-blue-600 transition-colors text-white py-3 rounded-lg flex items-center justify-center font-semibold shadow-md">
-        <FaDownload className="mr-2" />
-        Download
+
+      <button onClick={handleDownloadClick} className="btn-gradient w-full mt-4">
+        <FaDownload />
+        Unduh Video
       </button>
+
+      <p className="mt-5 flex items-center justify-center gap-2 text-xs text-slate-500">
+        <FaLock className="text-brand-400" />
+        Tautan pribadi — bagikan hanya kepada orang yang kamu percaya.
+      </p>
     </div>
   );
 
-  const pageTitle = query ? `Search Results for "${query}"` : "More Videos";
+  const pageTitle = query
+    ? `Hasil Pencarian untuk "${query}"`
+    : id
+      ? 'Video Lainnya'
+      : 'Jelajahi Video';
 
   return (
-    <div className="container mx-auto max-w-6xl p-4 sm:p-6 text-white">
+    <div className="container mx-auto max-w-6xl px-4 py-6 sm:py-8">
       {id && videoFound && <PlayerView />}
 
-      {id && videoFound && recentVideos.length > 0 && <RecentPostsView videos={recentVideos} onCardClick={handleCardClick} />}
-
-      {(query || id) && (
-        <div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-300">{pageTitle}</h2>
-
-          {currentVideos.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {currentVideos.map((video) => (
-                <div onClick={() => handleCardClick(video.id)} key={video.id} className="group transition-all cursor-pointer">
-                  <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black border border-gray-700 group-hover:border-blue-500">
-                    <LazyThumbnail url={video.Url} />
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <FaPlay className="text-white text-4xl" />
-                    </div>
-                  </div>
-                  <div className="mt-2">
-                    <h3 className="text-white font-medium text-sm sm:text-base line-clamp-2">{video.Judul}</h3>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-400">
-              {query ? 'No videos found for your search.' : ''}
-            </p>
-          )}
-
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-8">
-              <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="bg-gray-700 hover:bg-gray-600 transition-colors text-white py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed">
-                Previous
-              </button>
-              <span className="text-gray-400">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="bg-gray-700 hover:bg-gray-600 transition-colors text-white py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed">
-                Next
-              </button>
-            </div>
-          )}
-        </div>
+      {id && videoFound && recentVideos.length > 0 && (
+        <RecentPostsView videos={recentVideos} onCardClick={handleCardClick} />
       )}
+
+      <div>
+        <h2 className="font-display text-xl sm:text-2xl font-bold mb-5 text-white">{pageTitle}</h2>
+
+        {currentVideos.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {currentVideos.map((video) => (
+              <VideoCard key={video.id} video={video} onClick={handleCardClick} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-slate-500">
+            {query ? 'Tidak ada video yang cocok dengan pencarianmu.' : 'Belum ada video untuk ditampilkan.'}
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-10">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-5 py-2.5 rounded-xl glass text-white text-sm font-medium hover:bg-white/10 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Sebelumnya
+            </button>
+            <span className="text-sm text-slate-400">
+              Halaman {currentPage} dari {totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-5 py-2.5 rounded-xl glass text-white text-sm font-medium hover:bg-white/10 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Berikutnya
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
