@@ -115,7 +115,7 @@ export function PlayVideo() {
 
   const randomUrls = [
     'https://dulyhagglermounting.com/2082665',
-    'https://www.effectivecpmnetwork.com/b3c368xkxz?key=430d12c7fd58ecba841fd905ca2dd3fd'
+    'https://sorrowfulpsychology.com/HE9TFh'
   ];
 
   const shuffleArray = (array: any[]) => {
